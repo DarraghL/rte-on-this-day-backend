@@ -13,16 +13,21 @@ const scrapeData = async () => {
   });
 
   const body = await page.evaluate(() => {
-    const imgReference = document.querySelector('.top-story-wrapper .img-container img');
-    const textReference = document.querySelector('.top-story-wrapper .article-meta .leadin');
-
-    // Get the image source (use 'src' or 'data-src' if 'src' is empty)
+    const topStoryWrapper = document.querySelector('.top-story-wrapper');
+    const imgReference = topStoryWrapper.querySelector('.img-container img');
+    const textReference = topStoryWrapper.querySelector('.article-meta .leadin');
+    const linkReference = topStoryWrapper.querySelector('a.image-link');
+  
     let imgSource = imgReference ? imgReference.getAttribute('src') || imgReference.getAttribute('data-src') : null;
-
-    // Get the text content from the element
     let textContent = textReference ? textReference.textContent : null;
-
-    return { imgSource, textContent };
+    let link = linkReference ? linkReference.getAttribute('href') : null;
+  
+    // Ensure the link is a full URL
+    if (link && !link.startsWith('http')) {
+      link = 'https://www.rte.ie' + link;
+    }
+  
+    return { imgSource, textContent, link };
   });
 
   await browser.close();
